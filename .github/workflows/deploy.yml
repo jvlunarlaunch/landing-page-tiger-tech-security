@@ -1,0 +1,35 @@
+name: Deploy para Hostinger
+
+on:
+  push:
+    branches:
+      - master # Mude para 'master' se a sua branch padrão for master
+
+jobs:
+  deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🔨 Instalar e Buildar (Vite)
+        run: |
+          npm install
+          npm run build
+
+      - name: 📂 Enviar para Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # O caminho abaixo deve apontar para onde seu site fica na Hostinger
+          # Na maioria das vezes é /public_html/, mas se no painel mostrar outro caminho (ex: /domains/seusite.com/public_html/), altere aqui:
+          server-dir: /public_html/
+          local-dir: ./dist/
